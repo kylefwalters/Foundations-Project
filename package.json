@@ -1,0 +1,19 @@
+{
+  "name": "foundations-project",
+  "version": "1.0.0",
+  "description": "Reimbursement system for employee expenses",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kylefwalters/Foundations-Project.git"
+  },
+  "author": "Kyle W",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kylefwalters/Foundations-Project/issues"
+  },
+  "homepage": "https://github.com/kylefwalters/Foundations-Project#readme"
+}
