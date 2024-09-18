@@ -1,22 +1,23 @@
+const { getEmployeeByID } = require('../dynamoDB/DAO/employeeDAO')
+
 function setupLogin(app) {
     // Login with account credentials
-    app.post('/login', (req, res) => {
-        // Get query params
-        const queriedEmployeeid = req.query.employeeid;
+    app.post('/login', async (req, res) => {
         // Get login info
-        const logedInEmployee = '0';
+        const employeeID = req.body.employeeID;
+        const employeePassword = req.body.password;
+        const employee = await getEmployeeByID(String(employeeID));
 
-        if (logedInEmployee.isManager() || queriedEmployeeid == logedInEmployee) {
-            // Return ticket info
-            
+        // Check that credentials are valid
+        if (typeof employeeID === "undefined" || typeof employeePassword === "undefined") {
+            res.status(400)
+                .send("ID/Password is empty");
+        } else if (employee?.employeeID == employeeID && employee?.password == employeePassword) {
+            res.status(200).append("employeeID", employeeID)
+                .send("Login Successful!");
         } else {
-            // Unsuccessful response
-            res.status(401);
-            if (typeof queriedEmployeeid !== 'undefined') {
-                res.send(`You do not have access to the tickets of ${queriedEmployeeid}`);
-            } else {
-                res.send(`User does not have manager access`);
-            }
+            res.status(400)
+                .send("ID/Password is invalid");
         }
     });
 }
@@ -26,9 +27,7 @@ function setupRegister(app) {
     app.post('/register', (req, res) => {
         // Get account info
 
-
         // Send response
-        res.send(`register`);
     });
 }
 
