@@ -1,4 +1,4 @@
-const { GetCommand } = require("@aws-sdk/lib-dynamodb");
+const { GetCommand, PutCommand } = require("@aws-sdk/lib-dynamodb");
 const { runCommand } = require('../../utility/dynamoUtilities')
 
 const TableName = "Reimbursement_Employees";
@@ -13,6 +13,16 @@ async function getEmployeeByID(employeeID) {
     return data.Item;
 }
 
+async function postEmployee(employee) {
+    const command = new PutCommand({
+        TableName,
+        Item: employee
+    });
+    await runCommand(command);
+    return employee;
+}
+
 module.exports = {
-    getEmployeeByID
+    getEmployeeByID,
+    postEmployee
 };
