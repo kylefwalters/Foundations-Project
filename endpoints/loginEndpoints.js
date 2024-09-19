@@ -1,7 +1,8 @@
 const {
-    getEmployeeByID, 
+    getEmployeeByID,
     postEmployee
-} = require('../dynamoDB/DAO/employeeDAO')
+} = require('../dynamoDB/DAO/employeeDAO');
+const { validateAccount } = require("../utility/accountUtilities");
 
 function setupLogin(app) {
     // Login with account credentials
@@ -9,13 +10,16 @@ function setupLogin(app) {
         // Get login info
         const employeeID = req.body.employeeID;
         const employeePassword = req.body.password;
-        const employee = await getEmployeeByID(String(employeeID));
 
-        // Check that credentials are valid
-        if (typeof employeeID === "undefined" || typeof employeePassword === "undefined") {
+        if(!validateAccount(employeeID, employeePassword)) {
             res.status(400)
                 .send("ID/Password is empty");
-        } else if (employee?.employeeID == employeeID && employee?.password == employeePassword) {
+                return;
+        }
+
+        // Check that credentials are valid
+        const employee = await getEmployeeByID(String(employeeID));
+        if (employee?.employeeID == employeeID && employee?.password == employeePassword) {
             res.status(200).append("employeeID", employeeID)
                 .send("Login Successful!");
         } else {
@@ -31,19 +35,22 @@ function setupRegister(app) {
         // Get account info
         const employeeID = req.body.employeeID;
         const employeePassword = req.body.password;
-        const accountExists = await getEmployeeByID(String(employeeID)) ? true : false;
+
+        if(!validateAccount(employeeID, employeePassword)) {
+            res.status(400)
+                .send("ID/Password is empty");
+                return;
+        }
 
         // Send response
+        const accountExists = await getEmployeeByID(String(employeeID)) ? true : false;
         if (accountExists) {
             res.status(400)
                 .send("Account already exists");
-        } else if (typeof employeeID !== "undefined" || typeof employeePassword !== "undefined") {
-            const newAccount = await postEmployee({employeeID, password: employeePassword, role: "employee"});
+        } else {
+            const newAccount = await postEmployee({ employeeID, password: employeePassword, role: "employee" });
             res.status(200)
                 .send(JSON.stringify(newAccount));
-        } else {
-            res.status(400)
-                .send("ID/Password is invalid");
         }
     });
 }
