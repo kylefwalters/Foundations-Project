@@ -1,4 +1,4 @@
-const employeeDAO = require('../dynamoDB/DAO/employeeDAO');
+const employeeDAO = require('../DAO/employeeDAO');
 
 async function getEmployeeByID(employeeID) {
     const employee = await employeeDAO.getEmployeeByID(String(employeeID));

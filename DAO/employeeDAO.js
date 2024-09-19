@@ -1,5 +1,5 @@
 const { GetCommand, PutCommand } = require("@aws-sdk/lib-dynamodb");
-const { runCommand } = require('../../utility/dynamoUtilities')
+const { runCommand } = require('../utility/dynamoUtilities')
 
 const TableName = "Reimbursement_Employees";
 
