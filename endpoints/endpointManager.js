@@ -15,8 +15,12 @@ function initialize() {
 
     app.use(bodyParser.json());
 
-    // Create endpoints
+    // Middleware
     setupLogger(app);
+    loginEndpoints.setupAccountValidation(app);
+
+
+    // Create endpoints
     loginEndpoints.setupLogin(app);
     loginEndpoints.setupRegister(app);
     ticketEndpoints.setupTickets(app);
