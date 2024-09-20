@@ -3,8 +3,7 @@ const { runCommand } = require('../utility/dynamoUtilities')
 
 const TableName = "Reimbursement_Employees";
 
-async function getEmployeeByID(employeeID) {
-    const Key = { employeeID };
+async function getEmployeeByID(Key) {
     const command = new GetCommand({
         TableName,
         Key
