@@ -24,7 +24,7 @@ async function postTicket(ticket) {
 
 async function queryTickets(IndexName, KeyConditionExpression, ExpressionAttributeNames, ExpressionAttributeValues, FilterExpression) {
     const command = new QueryCommand({
-        TableName, 
+        TableName,
         IndexName,
         KeyConditionExpression,
         ExpressionAttributeNames,
@@ -35,15 +35,18 @@ async function queryTickets(IndexName, KeyConditionExpression, ExpressionAttribu
     return data?.Items;
 }
 
-async function scanTickets(ExpressionAttributeNames, ExpressionAttributeValues, FilterExpression) {
-    const command = new ScanCommand({
-        TableName, 
-        ExpressionAttributeNames,
-        ExpressionAttributeValues,
-        FilterExpression
-    });
+async function scanTickets(ExpressionAttributeNames, ExpressionAttributeValues, FilterExpression, ExclusiveStartKey = null) {
+    const params = {
+        TableName,
+        Limit: ExclusiveStartKey && FilterExpression ? 4 : 3
+    };
+    params.ExpressionAttributeNames = ExpressionAttributeNames ?? params.ExpressionAttributeNames;
+    params.ExpressionAttributeValues = ExpressionAttributeValues ?? params.ExpressionAttributeValues;
+    params.FilterExpression = FilterExpression ?? params.FilterExpression;
+    params.ExclusiveStartKey = ExclusiveStartKey ?? params.ExclusiveStartKey;
+    const command = new ScanCommand(params);
     const data = await runCommand(command);
-    return data?.Items;
+    return data;
 }
 
 module.exports = {

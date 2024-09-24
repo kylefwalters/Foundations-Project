@@ -22,10 +22,10 @@ async function getTicketsByEmployee(employeeID) {
 
     const tickets =
         await ticketDAO.queryTickets(IndexMap["employeeID"], KeyCondition, ExpressionAttributeNames, ExpressionAttributeValues);
-    return tickets
+    return tickets;
 }
 
-async function getTicketsWithParams(queryParams) {
+async function getTicketsWithParams(queryParams, page) {
     let FilterExpression = ''
     let ExpressionAttributeNames = {};
     let ExpressionAttributeValues = {};
@@ -35,10 +35,22 @@ async function getTicketsWithParams(queryParams) {
         ExpressionAttributeValues[':' + property] = queryParams[property];
     }
 
-    FilterExpression = FilterExpression.slice(0, FilterExpression.length - 4);
-    tickets =
+    if (FilterExpression.length == 0) {
+        FilterExpression = null;
+        ExpressionAttributeNames = null;
+        ExpressionAttributeValues = null;
+    }
+
+    FilterExpression = FilterExpression?.slice(0, FilterExpression.length - 4);
+    let data =
         await ticketDAO.scanTickets(ExpressionAttributeNames, ExpressionAttributeValues, FilterExpression);
-    return tickets;
+    while (page > 0 && data.LastEvaluatedKey) {
+        data =
+            await ticketDAO.scanTickets(ExpressionAttributeNames, ExpressionAttributeValues,
+                FilterExpression, data.LastEvaluatedKey);
+        page--;
+    }
+    return data?.Items;
 }
 
 async function postTicket({ ticketID, employeeID, status }) {

@@ -14,9 +14,8 @@ function setupTickets(app) {
 }
 
 async function getAllTickets(req, res) {
-    // TODO: pagination in case Query can't return all results
-    // TODO: create GSI for ticket status
-    const tickets = await getTicketsWithParams(req.query);
+    const page = req.body.page ?? 0;
+    const tickets = await getTicketsWithParams(req.query, page);
     if(tickets) {
         res.status(200).json(tickets);
     }else {
