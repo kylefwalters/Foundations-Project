@@ -1,5 +1,6 @@
-const { GetCommand, PutCommand } = require("@aws-sdk/lib-dynamodb");
-const { runCommand } = require('../utility/dynamoUtilities')
+const { GetCommand, PutCommand, ScanCommand } = require("@aws-sdk/lib-dynamodb");
+const { runCommand } = require('../utility/dynamoUtilities');
+const { QueryCommand } = require("@aws-sdk/client-dynamodb");
 
 const TableName = "Reimbursement_Tickets";
 
@@ -21,7 +22,33 @@ async function postTicket(ticket) {
     return ticket;
 }
 
+async function queryTickets(IndexName, KeyConditionExpression, ExpressionAttributeNames, ExpressionAttributeValues, FilterExpression) {
+    const command = new QueryCommand({
+        TableName, 
+        IndexName,
+        KeyConditionExpression,
+        ExpressionAttributeNames,
+        ExpressionAttributeValues,
+        FilterExpression
+    });
+    const data = await runCommand(command);
+    return data?.Items;
+}
+
+async function scanTickets(ExpressionAttributeNames, ExpressionAttributeValues, FilterExpression) {
+    const command = new ScanCommand({
+        TableName, 
+        ExpressionAttributeNames,
+        ExpressionAttributeValues,
+        FilterExpression
+    });
+    const data = await runCommand(command);
+    return data?.Items;
+}
+
 module.exports = {
     getTicketByID,
-    postTicket
+    postTicket,
+    queryTickets,
+    scanTickets
 };

@@ -1,3 +1,5 @@
+const { getEmployeeByID } = require('../service/employeeService');
+
 async function authenticateManagerAccess(req, res, next) {
     const employeeID = req.body.employeeID;
     const employee = await getEmployeeByID(employeeID);

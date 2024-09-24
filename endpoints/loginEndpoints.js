@@ -38,7 +38,7 @@ async function register(req, res) {
     } else {
         const newAccount = await postEmployee(employeeID, employeePassword, "employee");
         res.status(200)
-            .send(JSON.stringify(newAccount));
+            .json(newAccount);
     }
 }
 
