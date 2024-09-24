@@ -1,4 +1,4 @@
-const { login, register } = require('../endpoints/loginEndpoints');
+const { login, register, validateAccountCredentials } = require('../endpoints/loginEndpoints');
 const employeeService = require('../service/employeeService');
 
 jest.mock('../service/employeeService');
@@ -51,7 +51,8 @@ describe("loginEndpoints.login", () => {
         const mockRes = {
             status: jest.fn((code) => mockRes),
             append: jest.fn(() => mockRes),
-            send: jest.fn(() => mockRes)
+            send: jest.fn(() => mockRes),
+            json: jest.fn(() => mockRes)
         };
 
         await login(mockReq, mockRes);
@@ -122,14 +123,15 @@ describe("loginEndpoints.login", () => {
             append: jest.fn(() => mockRes),
             send: jest.fn(() => mockRes)
         };
+        const next = jest.fn();
 
-        await login(mockReq, mockRes);
+        await validateAccountCredentials(mockReq, mockRes, next);
 
         expect(mockRes.status).toHaveBeenCalledTimes(1);
         expect(mockRes.status).toHaveBeenCalledWith(400);
         expect(mockRes.send).toHaveBeenCalledTimes(1);
         expect(mockRes.send).toHaveBeenCalledWith("ID/Password is empty");
-        expect(employeeService.getEmployeeByID).toHaveBeenCalledTimes(0);
+        expect(next).toHaveBeenCalledTimes(0);
     });
 
     test("Logging in with empty password", async () => {
@@ -144,14 +146,15 @@ describe("loginEndpoints.login", () => {
             append: jest.fn(() => mockRes),
             send: jest.fn(() => mockRes)
         };
+        const next = jest.fn();
 
-        await login(mockReq, mockRes);
+        await validateAccountCredentials(mockReq, mockRes, next);
 
         expect(mockRes.status).toHaveBeenCalledTimes(1);
         expect(mockRes.status).toHaveBeenCalledWith(400);
         expect(mockRes.send).toHaveBeenCalledTimes(1);
         expect(mockRes.send).toHaveBeenCalledWith("ID/Password is empty");
-        expect(employeeService.getEmployeeByID).toHaveBeenCalledTimes(0);
+        expect(next).toHaveBeenCalledTimes(0);
     });
 });
 
@@ -162,7 +165,7 @@ describe("loginEndpoints.register", () => {
             password: "password",
             role: "employee"
         };
-        const expectedMessage = JSON.stringify(expectedAccount);
+        const expectedMessage = expectedAccount;
         const mockReq = {
             body: {
                 employeeID: expectedAccount.employeeID,
@@ -172,15 +175,16 @@ describe("loginEndpoints.register", () => {
         const mockRes = {
             status: jest.fn((code) => mockRes),
             append: jest.fn(() => mockRes),
-            send: jest.fn(() => mockRes)
+            send: jest.fn(() => mockRes),
+            json: jest.fn(() => mockRes)
         };
 
         await register(mockReq, mockRes);
 
         expect(mockRes.status).toHaveBeenCalledTimes(1);
         expect(mockRes.status).toHaveBeenCalledWith(200);
-        expect(mockRes.send).toHaveBeenCalledTimes(1);
-        expect(mockRes.send).toHaveBeenCalledWith(expectedMessage);
+        expect(mockRes.json).toHaveBeenCalledTimes(1);
+        expect(mockRes.json).toHaveBeenCalledWith(expectedMessage);
         expect(employeeService.getEmployeeByID).toHaveBeenCalledTimes(1);
         expect(employeeService.getEmployeeByID).toHaveBeenCalledWith(mockReq.body.employeeID);
         expect(employeeService.postEmployee).toHaveBeenCalledTimes(1);
@@ -211,52 +215,6 @@ describe("loginEndpoints.register", () => {
         expect(employeeService.postEmployee).toHaveBeenCalledTimes(0);
     });
 
-    test("Register with empty username", async () => {
-        const mockReq = {
-            body: {
-                employeeID: "",
-                password: "wrongPassword"
-            }
-        };
-        const mockRes = {
-            status: jest.fn((code) => mockRes),
-            append: jest.fn(() => mockRes),
-            send: jest.fn(() => mockRes)
-        };
-
-        await register(mockReq, mockRes);
-
-        expect(mockRes.status).toHaveBeenCalledTimes(1);
-        expect(mockRes.status).toHaveBeenCalledWith(400);
-        expect(mockRes.send).toHaveBeenCalledTimes(1);
-        expect(mockRes.send).toHaveBeenCalledWith("ID/Password is empty");
-        expect(employeeService.getEmployeeByID).toHaveBeenCalledTimes(0);
-        expect(employeeService.postEmployee).toHaveBeenCalledTimes(0);
-    });
-
-    test("Register with empty password", async () => {
-        const mockReq = {
-            body: {
-                employeeID: "mockEmployee1",
-                password: ""
-            }
-        };
-        const mockRes = {
-            status: jest.fn((code) => mockRes),
-            append: jest.fn(() => mockRes),
-            send: jest.fn(() => mockRes)
-        };
-
-        await register(mockReq, mockRes);
-
-        expect(mockRes.status).toHaveBeenCalledTimes(1);
-        expect(mockRes.status).toHaveBeenCalledWith(400);
-        expect(mockRes.send).toHaveBeenCalledTimes(1);
-        expect(mockRes.send).toHaveBeenCalledWith("ID/Password is empty");
-        expect(employeeService.getEmployeeByID).toHaveBeenCalledTimes(0);
-        expect(employeeService.postEmployee).toHaveBeenCalledTimes(0);
-    });
-
     test("Register, then attempt to register the same account", async () => {
         const expectedAccount = {
             employeeID: "mockEmployeeNew",
@@ -272,7 +230,8 @@ describe("loginEndpoints.register", () => {
         const mockRes = {
             status: jest.fn((code) => mockRes),
             append: jest.fn(() => mockRes),
-            send: jest.fn(() => mockRes)
+            send: jest.fn(() => mockRes),
+            json: jest.fn(() => mockRes)
         };
 
         await register(mockReq, mockRes);
@@ -280,7 +239,8 @@ describe("loginEndpoints.register", () => {
 
         expect(mockRes.status).toHaveBeenCalledTimes(2);
         expect(mockRes.status).toHaveBeenCalledWith(400);
-        expect(mockRes.send).toHaveBeenCalledTimes(2);
+        expect(mockRes.json).toHaveBeenCalledTimes(1);
+        expect(mockRes.send).toHaveBeenCalledTimes(1);
         expect(mockRes.send).toHaveBeenCalledWith("Account already exists");
         expect(employeeService.getEmployeeByID).toHaveBeenCalledTimes(2);
         expect(employeeService.getEmployeeByID).toHaveBeenNthCalledWith(1, mockReq.body.employeeID);

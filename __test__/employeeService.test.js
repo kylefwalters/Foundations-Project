@@ -23,6 +23,7 @@ function initializeMockDatabase() {
 
 describe('employeeService', () => {
     beforeAll(() => {
+        // Mock DAO
         employeeDAO.getEmployeeByID.mockImplementation((Key) => {
             return mockDatabase.find((user) => Key.employeeID == user.employeeID);
         });
