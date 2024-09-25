@@ -20,27 +20,37 @@ const mockDatabase = [];
 const mockPendingTicket = {
     ticketID: "mockPendingTicket",
     employeeID: "trhs56",
-    status: "Pending"
+    status: "Pending",
+    amount: 229.00,
+    description: "Mock description"
 };
 const mockPendingTicket2 = {
     ticketID: "mockPendingTicket2",
     employeeID: "534hdsr",
-    status: "Pending"
+    status: "Pending",
+    amount: 229.00,
+    description: "Mock description"
 };
 const mockApprovedTicket = {
     ticketID: "mockApprovedTicket",
     employeeID: "trhs56",
-    status: "Approved"
+    status: "Approved",
+    amount: 229.00,
+    description: "Mock description"
 };
 const mockPendingTicket3 = {
     ticketID: "mockPendingTicket3",
     employeeID: "kewk53",
-    status: "Pending"
+    status: "Pending",
+    amount: 229.00,
+    description: "Mock description"
 };
 const mockPendingTicket4 = {
     ticketID: "mockPendingTicket4",
     employeeID: "4jh4j6",
-    status: "Pending"
+    status: "Pending",
+    amount: 229.00,
+    description: "Mock description"
 };
 const mockUUID = "111fff22-62a9-4d68-ba32-47b2fbc43d71";
 
@@ -55,7 +65,7 @@ const mockRes = {
     json: jest.fn(() => mockRes)
 };
 
-describe('ticketService', () => {
+describe('ticketEndpoints', () => {
     beforeAll(() => {
         // Mock ticketService
         ticketService.getTicketByID.mockImplementation((ticketID) => {
@@ -187,11 +197,15 @@ describe('ticketService', () => {
 
     test("validateNewTicket should only pass if employeeID is valid", async () => {
         const employeeID = mockPendingTicket.employeeID;
+        const amount = 22.32;
+        const description = "Mock description"
         const employeeIDWrong = "FakeID";
         const employeeIDEmpty = "";
         const mockReqValid = {
             body: {
-                employeeID
+                employeeID,
+                amount,
+                description
             }
         };
         const mockReqWrong = {
