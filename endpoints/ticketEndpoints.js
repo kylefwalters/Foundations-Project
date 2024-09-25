@@ -45,16 +45,22 @@ async function getEmployeeTickets(req, res) {
 }
 
 async function validateNewTicket(req, res, next) {
-    const employeeID = req.body.employeeID;
+    let employeeID = req.body.employeeID;
+    let description = req.body.description;
+    let amount = req.body.amount;
 
-    const isString = typeof employeeID === "string";
-    const isValid = isString && employeeID.trim();
-    if (!isValid) {
+    const isEmpIDString = typeof employeeID === "string";
+    employeeID = isEmpIDString && employeeID.trim();
+    const isDescrfiptionString = typeof description === "string";
+    description = isDescrfiptionString && description.trim();
+    amount = Number(amount);
+
+    if (!employeeID || !amount || !description) {
         res.status(400)
-            .send("Employee ID is empty");
-    } else if (!await getEmployeeByID(employeeID)) {
+            .send("One or more values are empty");
+    } else if (amount <= 0 || !await getEmployeeByID(employeeID)) {
         res.status(400)
-            .send("Employee ID for ticket is invalid");
+            .send("One or more values are invalid");
     } else {
         next();
     }
@@ -64,9 +70,11 @@ async function submitTicket(req, res) {
     const ticketID = uuid.v4();
     const employeeID = req.body.employeeID;
     const ticketStatus = "Pending";
+    const ticketAmount = req.body.amount;
+    const description = req.body.description;
+    const ticketDate = Date.now();
 
-    // Submit ticket & send response
-    const newTicket = await postTicket(ticketID, employeeID, ticketStatus);
+    const newTicket = await postTicket(ticketID, employeeID, ticketStatus, ticketAmount, description, ticketDate);
     res.status(200)
         .json(newTicket);
 }

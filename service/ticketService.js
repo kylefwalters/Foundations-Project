@@ -53,9 +53,9 @@ async function getTicketsWithParams(queryParams, page) {
     return data?.Items;
 }
 
-async function postTicket({ ticketID, employeeID, status }) {
-    const employee = { ticketID, employeeID, status };
-    const newAccount = await ticketDAO.postTicket(employee);
+async function postTicket(ticketID, employeeID, status, amount, description, date) {
+    const ticket = { ticketID, employeeID, status, amount, description, date };
+    const newAccount = await ticketDAO.postTicket(ticket);
     return newAccount;
 }
 
