@@ -16,9 +16,9 @@ function setupTickets(app) {
 async function getAllTickets(req, res) {
     const page = req.body.page ?? 0;
     const tickets = await getTicketsWithParams(req.query, page);
-    if(tickets) {
+    if (tickets) {
         res.status(200).json(tickets);
-    }else {
+    } else {
         res.status(400).send("Invalid query param(s)");
     }
 }
@@ -63,7 +63,7 @@ async function validateNewTicket(req, res, next) {
 async function submitTicket(req, res) {
     const ticketID = uuid.v4();
     const employeeID = req.body.employeeID;
-    const ticketStatus = "pending";
+    const ticketStatus = "Pending";
 
     // Submit ticket & send response
     const newTicket = await postTicket(ticketID, employeeID, ticketStatus);
@@ -84,7 +84,7 @@ async function validateUpdatedTicket(req, res, next) {
     } else if (!validTicket) {
         res.status(400)
             .send("Ticket ID is invalid");
-    } else if (validTicket.status != "pending") {
+    } else if (validTicket.status != "Pending") {
         res.status(400)
             .send("Cannot change status of closed ticket");
     } else {
@@ -105,5 +105,15 @@ async function updateTicketStatus(req, res) {
 }
 
 module.exports = {
-    setupTickets
+    setupTickets,
+    getAllTickets,
+    authenticateManagerAccess,
+    authenticateEmployeeTicketAccess,
+    getEmployeeTickets,
+    authenticateEmployeeAccess,
+    validateNewTicket,
+    submitTicket,
+    authenticateManagerAccess,
+    validateUpdatedTicket,
+    updateTicketStatus
 };
