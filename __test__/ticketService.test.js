@@ -187,7 +187,8 @@ describe('ticketService', () => {
             description: "Mock description",
             date: "15392385628"
         };
-        const result = await ticketService.postTicket(newTicket);
+        const { ticketID, employeeID, status, amount, description, date } = newTicket;
+        const result = await ticketService.postTicket(ticketID, employeeID, status, amount, description, date );
 
         expect(result).toStrictEqual(newTicket);
     });

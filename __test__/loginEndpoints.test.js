@@ -59,8 +59,7 @@ describe("loginEndpoints.login", () => {
 
         expect(mockRes.status).toHaveBeenCalledTimes(1);
         expect(mockRes.status).toHaveBeenCalledWith(200);
-        expect(mockRes.send).toHaveBeenCalledTimes(1);
-        expect(mockRes.send).toHaveBeenCalledWith("Login Successful!");
+        expect(mockRes.json).toHaveBeenCalledTimes(1);
         expect(employeeService.getEmployeeByID).toHaveBeenCalledTimes(1);
         expect(employeeService.getEmployeeByID).toHaveBeenCalledWith(mockReq.body.employeeID);
     });
