@@ -1,5 +1,4 @@
 const accountUtilities = require('../utility/accountUtilities');
-const dynamoUtilities = require('../utility/dynamoUtilities');
 const employeeService = require('../service/employeeService');
 const jwt = require("jsonwebtoken");
 

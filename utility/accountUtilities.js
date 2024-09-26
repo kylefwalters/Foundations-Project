@@ -22,7 +22,7 @@ async function authenticateManagerAccess(req, res, next) {
 async function authenticateEmployeeAccess(req, res, next) {
     async function hasEmployeeAccess(employee) {
         const employeeExists = await getEmployeeByID(employee.employeeID);
-        return employeeExists && employee.role === "employee";
+        return employeeExists && (employee.role === "employee" || employee.role === "manager");
     }
 
     const hasAccess = await validateToken(req, hasEmployeeAccess);
@@ -48,7 +48,7 @@ async function validateToken(req, validationCallback) {
     }
     const employee = await decodeJWT(token);
 
-    return await validationCallback(employee);
+    return employee && await validationCallback(employee);
 }
 
 async function decodeJWT(token){
@@ -60,8 +60,15 @@ async function decodeJWT(token){
     }
 }
 
+async function getEmployeeFromToken(req) {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    return await decodeJWT(token);
+}
+
 module.exports = {
     validateAccount,
     authenticateManagerAccess,
-    authenticateEmployeeAccess
+    authenticateEmployeeAccess,
+    getEmployeeFromToken
 }

@@ -2,14 +2,14 @@ const express = require('express');
 const uuid = require('uuid');
 const { getTicketByID, getTicketsByEmployee, getTicketsWithParams, postTicket } = require('../service/ticketService');
 const { getEmployeeByID } = require('../service/employeeService');
-const { authenticateManagerAccess, authenticateEmployeeAccess } = require('../utility/accountUtilities');
+const { authenticateManagerAccess, authenticateEmployeeAccess, getEmployeeFromToken } = require('../utility/accountUtilities');
 
 function setupTickets(app) {
     const ticketRouter = express.Router({ mergeParams: true });
     ticketRouter.get('/', authenticateManagerAccess, getAllTickets);
     ticketRouter.get('/:employeeID', authenticateEmployeeTicketAccess, getEmployeeTickets);
     ticketRouter.post('/', authenticateEmployeeAccess, validateNewTicket, submitTicket);
-    ticketRouter.put('/:ticketID', authenticateManagerAccess, validateUpdatedTicket, updateTicketStatus);
+    ticketRouter.put('/:employeeID/:ticketID', authenticateManagerAccess, validateUpdatedTicket, updateTicketStatus);
     app.use('/tickets', ticketRouter);
 }
 
@@ -80,12 +80,13 @@ async function submitTicket(req, res) {
 }
 
 async function validateUpdatedTicket(req, res, next) {
-    const ticketID = req.body.ticketID;
-    const ticketStatus = req.body.ticketStatus;
+    const employeeID = req.params.employeeID;
+    const ticketID = req.params.ticketID;
+    const ticketStatus = req.body.status;
 
     const isString = typeof ticketID === "string" && typeof ticketStatus === "string";
     const isValid = isString && ticketID.trim() && ticketStatus.trim();
-    const validTicket = await getTicketByID(ticketID);
+    const validTicket = await getTicketByID(ticketID, employeeID);
     if (!isValid) {
         res.status(400)
             .send("Ticket ID/Ticket Status is empty");
@@ -101,13 +102,16 @@ async function validateUpdatedTicket(req, res, next) {
 }
 
 async function updateTicketStatus(req, res) {
-    const ticketID = req.body.ticketID;
-    const ticketStatus = req.body.ticketStatus;
+    const employeeID = req.params.employeeID;
+    const ticketID = req.params.ticketID;
+    const ticketStatus = req.body.status;
+    const employee = await getEmployeeFromToken(req);
 
     // Update ticket
-    const ticket = await getTicketByID(ticketID);
+    const ticket = await getTicketByID(ticketID, employeeID);
     ticket.status = ticketStatus;
-    await postTicket(ticket);
+    const { status, amount, description, date } = ticket;
+    await postTicket(ticketID, employeeID, status, amount, description, date);
     res.status(200)
         .send(`Ticket updated with stats: ${ticketStatus}`);
 }

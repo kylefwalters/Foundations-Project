@@ -10,7 +10,7 @@ async function getTicketByID(Key) {
         Key
     });
     const data = await runCommand(command);
-    return data.Item;
+    return data?.Item;
 }
 
 async function postTicket(ticket) {

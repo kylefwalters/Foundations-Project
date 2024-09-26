@@ -5,8 +5,11 @@ const IndexMap = {
     status: "status-index"
 }
 
-async function getTicketByID(ticketID) {
-    const Key = { ticketID: ticketID };
+async function getTicketByID(ticketID, employeeID) {
+    const Key = {
+        ticketID: ticketID, 
+        employeeID: employeeID
+    };
     const ticket = await ticketDAO.getTicketByID(Key);
     return ticket;
 }

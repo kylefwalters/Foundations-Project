@@ -1,4 +1,5 @@
 const uuid = require('uuid');
+const jwt = require("jsonwebtoken");
 const ticketService = require('../service/ticketService');
 const employeeService = require('../service/employeeService');
 const { getAllTickets,
@@ -12,6 +13,7 @@ const { getAllTickets,
     updateTicketStatus } = require('../endpoints/ticketEndpoints');
 
 jest.mock('uuid');
+jest.mock('jsonwebtoken');
 jest.mock('../service/ticketService');
 jest.mock('../service/employeeService');
 
@@ -252,15 +254,21 @@ describe('ticketEndpoints', () => {
 
     test("validateUpdatedTicket should only accept if ticketID is valid and ticket is not already closed", async () => {
         const mockReqValid = {
-            body: {
+            params: {
                 ticketID: "mockPendingTicket",
-                ticketStatus: "Accepted"
+                employeeID: "employeeID"
+            },
+            body: {
+                status: "Accepted"
             }
         };
         const mockReqClosed = {
-            body: {
+            params: {
                 ticketID: "mockApprovedTicket",
-                ticketStatus: "Accepted"
+                employeeID: "employeeID"
+            },
+            body: {
+                status: "Accepted"
             }
         };
         const mockResValid = Object.assign(mockRes);
@@ -276,11 +284,23 @@ describe('ticketEndpoints', () => {
 
     test("updateTicketStatus should return 200 with updated ticket status", async () => {
         const mockReqValid = {
-            body: {
+            headers: {
+                authorization: "Bearing authToken"
+            },
+            params: {
                 ticketID: "mockPendingTicket",
-                ticketStatus: "Accepted"
+                employeeID: "employeeID"
+            },
+            body: {
+                status: "Accepted"
             }
         };
+        jwt.verify.mockImplementation((token, key) => {
+            return {
+                employeeID: "validID",
+                role: "manager"
+            };
+        });
 
         await updateTicketStatus(mockReqValid, mockRes);
 

@@ -29,7 +29,7 @@ async function login(req, res) {
 function generateNewJWTToken(employee) {
     const token = jwt.sign(
         {
-            id: employee.employeeID,
+            employeeID: employee.employeeID,
             role: employee.role
         },
         secretKey,
