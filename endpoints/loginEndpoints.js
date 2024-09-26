@@ -1,5 +1,8 @@
+const jwt = require('jsonwebtoken');
 const { getEmployeeByID, postEmployee } = require('../service/employeeService')
 const { validateAccount } = require("../utility/accountUtilities");
+
+const secretKey = "cd3fe888-85b1-4c9f-ae35-83816ea20e39";
 
 function setupLogin(app) {
     app.post('/login', login);
@@ -13,12 +16,28 @@ async function login(req, res) {
     // Check that credentials are valid
     const employee = await getEmployeeByID(employeeID);
     if (employee?.password == employeePassword) {
+        const token = generateNewJWTToken(employee);
+
         res.status(200).append("employeeID", employeeID)
-            .send("Login Successful!");
+            .json(token);
     } else {
         res.status(400)
             .send("ID/Password is invalid");
     }
+}
+
+function generateNewJWTToken(employee) {
+    const token = jwt.sign(
+        {
+            id: employee.employeeID,
+            role: employee.role
+        },
+        secretKey,
+        {
+            expiresIn: "30m"
+        }
+    );
+    return token;
 }
 
 function setupRegister(app) {
