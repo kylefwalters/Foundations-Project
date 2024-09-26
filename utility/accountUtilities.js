@@ -21,8 +21,8 @@ async function authenticateManagerAccess(req, res, next) {
 
 async function authenticateEmployeeAccess(req, res, next) {
     async function hasEmployeeAccess(employee) {
-        // const employeeExists = await getEmployeeByID(employee.employeeID);
-        return true;
+        const employeeExists = await getEmployeeByID(employee.employeeID);
+        return employeeExists && employee.role === "employee";
     }
 
     const hasAccess = await validateToken(req, hasEmployeeAccess);
