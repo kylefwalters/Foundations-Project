@@ -112,7 +112,7 @@ async function updateTicketStatus(req, res) {
     const { status, amount, description, date } = ticket;
     await postTicket(ticketID, employeeID, status, amount, description, date);
     res.status(200)
-        .send(`Ticket updated with stats: ${ticketStatus}`);
+        .send(`Ticket updated with status: ${ticketStatus}`);
 }
 
 module.exports = {
