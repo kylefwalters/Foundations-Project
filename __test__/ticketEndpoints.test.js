@@ -204,18 +204,26 @@ describe('ticketEndpoints', () => {
         const employeeIDWrong = "FakeID";
         const employeeIDEmpty = "";
         const mockReqValid = {
+            headers: {
+                authorization: "Bearing authToken"
+            },
             body: {
-                employeeID,
                 amount,
                 description
             }
         };
         const mockReqWrong = {
+            headers: {
+                authorization: "Bearing authToken"
+            },
             body: {
                 employeeIDWrong
             }
         };
         const mockReqEmpty = {
+            headers: {
+                authorization: "Bearing authToken"
+            },
             body: {
                 employeeIDEmpty
             }
@@ -225,6 +233,12 @@ describe('ticketEndpoints', () => {
         const mockResEmpty = Object.assign(mockRes);
         const mockNext = jest.fn();
 
+        jwt.verify.mockImplementation((token, key) => {
+            return {
+                employeeID: "employeeID",
+                role: "employee"
+            };
+        });
         await validateNewTicket(mockReqValid, mockResValid, mockNext);
         await validateNewTicket(mockReqWrong, mockResWrong, mockNext);
         await validateNewTicket(mockReqEmpty, mockResEmpty, mockNext);
@@ -237,6 +251,9 @@ describe('ticketEndpoints', () => {
     test("submitTicket should return new ticket as JSON", async () => {
         const employeeID = mockPendingTicket.employeeID;
         const mockReq = {
+            headers: {
+                authorization: "Bearing authToken"
+            },
             body: {
                 employeeID
             }
@@ -247,6 +264,12 @@ describe('ticketEndpoints', () => {
             status: "Pending"
         }
 
+        jwt.verify.mockImplementation((token, key) => {
+            return {
+                employeeID: employeeID,
+                role: "employee"
+            };
+        });
         await submitTicket(mockReq, mockRes);
 
         expect(mockRes.json).toHaveBeenCalledWith(expected);
@@ -275,6 +298,12 @@ describe('ticketEndpoints', () => {
         const mockResClosed = Object.assign(mockRes);
         const mockNext = jest.fn();
         
+        jwt.verify.mockImplementation((token, key) => {
+            return {
+                employeeID: "employeeID",
+                role: "employee"
+            };
+        });
         await validateUpdatedTicket(mockReqValid, mockResValid, mockNext);
         await validateUpdatedTicket(mockReqClosed, mockResClosed, mockNext);
 

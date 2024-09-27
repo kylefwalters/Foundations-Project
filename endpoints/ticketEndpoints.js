@@ -45,7 +45,7 @@ async function getEmployeeTickets(req, res) {
 }
 
 async function validateNewTicket(req, res, next) {
-    let employeeID = req.body.employeeID;
+    let employeeID = (await getEmployeeFromToken(req)).employeeID;
     let description = req.body.description;
     let amount = req.body.amount;
 
@@ -68,7 +68,7 @@ async function validateNewTicket(req, res, next) {
 
 async function submitTicket(req, res) {
     const ticketID = uuid.v4();
-    const employeeID = req.body.employeeID;
+    const employeeID = (await getEmployeeFromToken(req)).employeeID;
     const ticketStatus = "Pending";
     const ticketAmount = req.body.amount;
     const description = req.body.description;
@@ -105,7 +105,6 @@ async function updateTicketStatus(req, res) {
     const employeeID = req.params.employeeID;
     const ticketID = req.params.ticketID;
     const ticketStatus = req.body.status;
-    const employee = await getEmployeeFromToken(req);
 
     // Update ticket
     const ticket = await getTicketByID(ticketID, employeeID);
