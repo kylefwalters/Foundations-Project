@@ -148,6 +148,9 @@ describe('ticketEndpoints', () => {
         });
 
         const mockReqValid = {
+            headers: {
+                authorization: "Bearing authToken"
+            },
             body: {
                 employeeID: employeeID
             },
@@ -156,6 +159,9 @@ describe('ticketEndpoints', () => {
             }
         };
         const mockReqManager = {
+            headers: {
+                authorization: "Bearing authToken"
+            },
             body: {
                 employeeID: managerID
             },
@@ -164,6 +170,9 @@ describe('ticketEndpoints', () => {
             }
         };
         const mockReqWrong = {
+            headers: {
+                authorization: "Bearing authToken"
+            },
             body: {
                 employeeID: fakeID
             },
@@ -176,8 +185,26 @@ describe('ticketEndpoints', () => {
         const mockResWrong = Object.assign(mockRes);
         const mockNext = jest.fn();
 
+        jwt.verify.mockImplementation((token, key) => {
+            return {
+                employeeID: employeeID,
+                role: "employee"
+            };
+        });
         await authenticateEmployeeTicketAccess(mockReqValid, mockResValid, mockNext);
+        jwt.verify.mockImplementation((token, key) => {
+            return {
+                employeeID: managerID,
+                role: "manager"
+            };
+        });
         await authenticateEmployeeTicketAccess(mockReqManager, mockResManager, mockNext);
+        jwt.verify.mockImplementation((token, key) => {
+            return {
+                employeeID: fakeID,
+                role: "employee"
+            };
+        });
         await authenticateEmployeeTicketAccess(mockReqWrong, mockResWrong, mockNext);
 
         expect(mockNext).toHaveBeenCalledTimes(2);
