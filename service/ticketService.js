@@ -29,7 +29,7 @@ async function getTicketsByEmployee(employeeID) {
 }
 
 async function getTicketsWithParams(queryParams, page) {
-    let FilterExpression = ''
+    let FilterExpression = '';
     let ExpressionAttributeNames = {};
     let ExpressionAttributeValues = {};
     for (const property in queryParams) {
