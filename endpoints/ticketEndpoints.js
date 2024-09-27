@@ -24,7 +24,7 @@ async function getAllTickets(req, res) {
 }
 
 async function authenticateEmployeeTicketAccess(req, res, next) {
-    const employeeID = req.body.employeeID;
+    const employeeID = (await getEmployeeFromToken(req)).employeeID;
     const requestedEmployeeID = req.params.employeeID;
     const employee = await getEmployeeByID(employeeID);
     const hasAccess = employee.role === "manager" || employeeID === requestedEmployeeID;
